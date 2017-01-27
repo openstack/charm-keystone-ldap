@@ -16,7 +16,7 @@ import unittest
 
 import mock
 
-import charm.openstack.sdn_charm as sdn_charm
+import charm.openstack.keystone_ldap as keystone_ldap
 
 
 class Helper(unittest.TestCase):
@@ -42,3 +42,4 @@ class Helper(unittest.TestCase):
 
 
 class TestSDNCharm(Helper):
+    pass

@@ -28,12 +28,17 @@ DOMAIN_CONF = "/etc/keystone/domains/keystone.{}.conf"
 KEYSTONE_CONF_TEMPLATE = "keystone.conf"
 
 
-class KeystoneLDAPConfigurationAdapter(charms_openstack.adapters.ConfigurationAdapter):
-    '''Charm specific configuration adapter to deal with ldap config flag parsing'''
+class KeystoneLDAPConfigurationAdapter(
+        charms_openstack.adapters.ConfigurationAdapter):
+    '''Charm specific configuration adapter to deal with ldap
+    config flag parsing
+    '''
 
     @property
     def ldap_options(self):
-        return os_utils.config_flags_parser(hookenv.config('ldap-config-flags'))
+        return os_utils.config_flags_parser(
+            hookenv.config('ldap-config-flags')
+        )
 
 
 class KeystoneLDAPCharm(charms_openstack.charm.OpenStackCharm):
@@ -56,7 +61,8 @@ class KeystoneLDAPCharm(charms_openstack.charm.OpenStackCharm):
     def domain_name(self):
         """Domain name for the running application
 
-        :returns: string containing the current domain name for the application
+        :returns: string: containing the current domain name for the
+                          application
         """
         return hookenv.config('domain-name') or hookenv.service_name()
 
@@ -113,8 +119,8 @@ def render_config(restart_trigger):
 
 
 def assess_status():
-    """Just call the KeystoneLDAPCharm.singleton.assess_status() command to update
-    status on the unit.
+    """Just call the KeystoneLDAPCharm.singleton.assess_status() command
+    to update status on the unit.
     """
     KeystoneLDAPCharm.singleton.assess_status()
 
