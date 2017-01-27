@@ -21,7 +21,7 @@ LDAP configuration is provided to this charm via configuration options:
                 ldap-password="password" \
                 ldap-suffix="dc=test,dc=com"
 
-by default, the name of the application ('keystone-ldap') is the name of
+By default, the name of the application ('keystone-ldap') is the name of
 the domain for which a domain specific configuration will be configured;
 you can change this using the domain-name option:
 
@@ -29,6 +29,15 @@ you can change this using the domain-name option:
 
 The keystone charm will automatically create a domain to support the backend
 once deployed.
+
+Additional LDAP configuration options can be passed as a comma delimited
+string using the ldap-config-flags configuration option:
+
+    juju config keystone-ldap \
+        ldap-config-flags="user_id_attribute=cn,user_name_attribute=cn"
+
+This allows the LDAP configuration of the backend to be tailored to an
+individual LDAP configuration.
 
 # Bugs
 

@@ -18,12 +18,22 @@ import charmhelpers.core.host as ch_host
 import charmhelpers.core.hookenv as hookenv
 
 import charmhelpers.contrib.openstack.templating as os_templating
+import charmhelpers.contrib.openstack.utils as os_utils
 
 import charms_openstack.charm
+import charms_openstack.adapters
 
 
 DOMAIN_CONF = "/etc/keystone/domains/keystone.{}.conf"
 KEYSTONE_CONF_TEMPLATE = "keystone.conf"
+
+
+class KeystoneLDAPConfigurationAdapter(charms_openstack.adapters.ConfigurationAdapter):
+    '''Charm specific configuration adapter to deal with ldap config flag parsing'''
+
+    @property
+    def ldap_options(self):
+        return os_utils.config_flags_parser(hookenv.config('ldap-config-flags'))
 
 
 class KeystoneLDAPCharm(charms_openstack.charm.OpenStackCharm):
@@ -39,6 +49,8 @@ class KeystoneLDAPCharm(charms_openstack.charm.OpenStackCharm):
 
     # List of packages to install for this charm
     packages = ['python-ldap', 'python-ldappool']
+
+    configuration_class = KeystoneLDAPConfigurationAdapter
 
     @property
     def domain_name(self):
