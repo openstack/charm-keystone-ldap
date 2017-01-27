@@ -1,0 +1,7 @@
+build
+layers
+.tox
+interfaces
+.testrepository
+*__pycache__*
+*.pyc

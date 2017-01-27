@@ -1,0 +1,5 @@
+includes: ['layer:openstack', 'interface:keystone-domain-backend']
+options:
+  basic:
+    use_venv: True
+    include_system_packages: True

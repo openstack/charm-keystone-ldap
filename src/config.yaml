@@ -1,0 +1,29 @@
+options:
+  domain-name:
+    type: string
+    default:
+    description: Name of the keystone domain to configure; defaults to the deployed application name.
+  ldap-server:
+    type: string
+    default:
+    description: LDAP server address for keystone identity backend.
+  ldap-user:
+    type: string
+    default:
+    description: Username of the LDAP identity server.
+  ldap-password:
+    type: string
+    default:
+    description: Password of the LDAP identity server.
+  ldap-suffix:
+    type: string
+    default:
+    description: LDAP server suffix to be used by keystone.
+  ldap-config-flags:
+    type: string
+    default:
+    description: comma sperated options for LDAP configuration.
+  ldap-readonly:
+    type: boolean
+    default: True
+    description: LDAP identity server backend readonly to keystone.
