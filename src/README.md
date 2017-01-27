@@ -29,3 +29,9 @@ you can change this using the domain-name option:
 
 The keystone charm will automatically create a domain to support the backend
 once deployed.
+
+# Bugs
+
+Please report bugs on [Launchpad](https://bugs.launchpad.net/charm-keystone-ldap/+filebug).
+
+For general questions please refer to the OpenStack [Charm Guide](http://docs.openstack.org/developer/charm-guide/).
