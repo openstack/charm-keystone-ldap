@@ -35,7 +35,7 @@ class TestRegisteredHooks(test_utils.TestRegisteredHooks):
             }
         }
         # test that the hooks were registered via the
-        # reactive.barbican_handlers
+        # reactive.keystone_ldap_handlers
         self.registered_hooks_test_helper(handlers, hook_set, defaults)
 
 
