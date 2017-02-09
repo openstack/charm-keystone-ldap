@@ -108,7 +108,6 @@ class KeystoneLDAPCharmDeployment(amulet_deployment.OpenStackAmuletDeployment):
                 'domain-name': 'userdomain',
             }
 
-
     def _get_token(self):
         return self.keystone.service_catalog.catalog['token']['id']
 
