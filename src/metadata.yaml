@@ -7,8 +7,8 @@ description:
   drivers, allowing different types of authentication backend to be
   deployed in a single Keystone deployment.
   .
-  This charm supports use of LDAP or Active Directory backends, with
-  configuration details provided by charm configuration options.
+  This charm supports use of LDAP or Active Directory domain backends,
+  with configuration details provided by charm configuration options.
 tags:
   - openstack
   - ldap
