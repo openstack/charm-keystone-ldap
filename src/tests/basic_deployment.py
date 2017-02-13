@@ -15,8 +15,6 @@
 
 import os
 
-import amulet
-
 import charmhelpers.contrib.openstack.amulet.deployment as amulet_deployment
 import charmhelpers.contrib.openstack.amulet.utils as os_amulet_utils
 
@@ -117,23 +115,51 @@ class KeystoneLDAPCharmDeployment(amulet_deployment.OpenStackAmuletDeployment):
         self.keystone_ldap = self.d.sentry['keystone-ldap'][0]
         self.mysql_sentry = self.d.sentry['percona-cluster'][0]
         self.keystone_sentry = self.d.sentry['keystone'][0]
+        self.keystone_ip = self.keystone_sentry.relation(
+            'shared-db',
+            'percona-cluster:shared-db')['private-address']
         # Authenticate admin with keystone endpoint
-        self.keystone = u.authenticate_keystone_admin(self.keystone_sentry,
-                                                      user='admin',
-                                                      password='openstack',
-                                                      tenant='admin')
+        self.keystone = self.get_keystone_client(api_version=3)
 
-    def test_100_services(self):
-        """Verify the expected services are running on the corresponding
-           service units."""
-        u.log.debug('Checking system services on units...')
+    def get_keystone_client(self, api_version=None, keystone_ip=None):
+        if keystone_ip is None:
+            keystone_ip = self.keystone_ip
+        if api_version == 2:
+            return u.authenticate_keystone_admin(self.keystone_sentry,
+                                                 user='admin',
+                                                 password='openstack',
+                                                 tenant='admin',
+                                                 api_version=api_version,
+                                                 keystone_ip=keystone_ip)
+        else:
+            return u.authenticate_keystone_admin(self.keystone_sentry,
+                                                 user='admin',
+                                                 password='openstack',
+                                                 api_version=api_version,
+                                                 keystone_ip=keystone_ip)
 
-        service_names = {
-            self.keystone_ldap: [],
-        }
+    def find_keystone_v3_user(self, client, username, domain):
+        """Find a user within a specified keystone v3 domain"""
+        domain_users = client.users.list(
+            domain=client.domains.find(name=domain).id
+        )
+        for user in domain_users:
+            if username.lower() == user.name.lower():
+                return user
+        return None
 
-        ret = u.validate_services_by_name(service_names)
-        if ret:
-            amulet.raise_status(amulet.FAIL, msg=ret)
+    def test_100_keystone_ldap_users(self):
+        """Validate basic functionality of keystone API"""
+        if not self.ldap_configured:
+            msg = 'Skipping API tests as no LDAP test fixture'
+            u.log.info(msg)
+            return
 
-        u.log.debug('OK')
+        # NOTE(jamespage): Test fixture should have johndoe and janedoe
+        #                  accounts
+        johndoe = self.find_keystone_v3_user(self.keystone,
+                                             'johndoe', 'keystone-ldap')
+        assert johndoe is not None
+        janedoe = self.find_keystone_v3_user(self.keystone,
+                                             'janedoe', 'keystone-ldap')
+        assert janedoe is not None
