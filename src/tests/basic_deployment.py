@@ -50,10 +50,13 @@ class KeystoneLDAPCharmDeployment(amulet_deployment.OpenStackAmuletDeployment):
         this_service = {'name': 'keystone-ldap'}
         other_services = [
             {'name': 'keystone'},
-            {'name': 'percona-cluster', 'constraints': {'mem': '3072M'}},
+            {'name': 'percona-cluster'},
         ]
-        super(KeystoneLDAPCharmDeployment, self)._add_services(this_service,
-                                                               other_services)
+        super(KeystoneLDAPCharmDeployment, self)._add_services(
+            this_service,
+            other_services,
+            no_origin=['keystone-ldap']
+        )
 
     def _add_relations(self):
         """Add all of the relations for the services."""
@@ -72,10 +75,7 @@ class KeystoneLDAPCharmDeployment(amulet_deployment.OpenStackAmuletDeployment):
         }
         keystone_ldap_config = self._get_ldap_config()
         pxc_config = {
-            'dataset-size': '25%',
             'max-connections': 1000,
-            'root-password': 'ChangeMe123',
-            'sst-password': 'ChangeMe123',
         }
         configs = {'keystone': keystone_config,
                    'keystone-ldap': keystone_ldap_config,
