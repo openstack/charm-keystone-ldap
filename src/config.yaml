@@ -22,7 +22,16 @@ options:
   ldap-config-flags:
     type: string
     default:
-    description: comma sperated options for LDAP configuration.
+    description: |
+      Additional LDAP configuration options.
+      For simple configurations use a comma separated string of key=value pairs.
+      "user_allow_create=False, user_allow_update=False, user_allow_delete=False"
+      For more complex configurations use a json like string with double quotes
+      and braces around all the options and single quotes around complex values.
+      "{user_tree_dn: 'DC=dc1,DC=ad,DC=example,DC=com',
+        user_allow_create: False,
+        user_allow_delete: False}"
+      See the README for more details.
   ldap-readonly:
     type: boolean
     default: True

@@ -143,9 +143,13 @@ class KeystoneLDAPCharmDeployment(amulet_deployment.OpenStackAmuletDeployment):
         domain_users = client.users.list(
             domain=client.domains.find(name=domain).id
         )
+        usernames = []
         for user in domain_users:
+            usernames.append(user.name)
             if username.lower() == user.name.lower():
                 return user
+        u.log.debug("The user {} was not in these users: {}. Returning None."
+                    "".format(username, usernames))
         return None
 
     def test_100_keystone_ldap_users(self):
@@ -158,8 +162,8 @@ class KeystoneLDAPCharmDeployment(amulet_deployment.OpenStackAmuletDeployment):
         # NOTE(jamespage): Test fixture should have johndoe and janedoe
         #                  accounts
         johndoe = self.find_keystone_v3_user(self.keystone,
-                                             'johndoe', 'keystone-ldap')
+                                             'john doe', 'userdomain')
         assert johndoe is not None
         janedoe = self.find_keystone_v3_user(self.keystone,
-                                             'janedoe', 'keystone-ldap')
+                                             'jane doe', 'userdomain')
         assert janedoe is not None

@@ -30,14 +30,44 @@ you can change this using the domain-name option:
 The keystone charm will automatically create a domain to support the backend
 once deployed.
 
-Additional LDAP configuration options can be passed as a comma delimited
-string using the ldap-config-flags configuration option:
+LDAP configurations can be quite complex. The ldap-config-flags configuration
+option provides the mechanism to pass arbitrary configuration options to
+keystone in order to handle any given LDAP backend's specific requirements.
+
+For very simple LDAP configurations a string of comma delimited key=value pairs
+can be used:
 
     juju config keystone-ldap \
         ldap-config-flags="user_id_attribute=cn,user_name_attribute=cn"
 
-This allows the LDAP configuration of the backend to be tailored to an
-individual LDAP configuration.
+For more complex configurations such as working with Active Directory use
+a configuration yaml file.
+
+    juju config keystone-ldap --file flags-config.yaml
+
+Where flags-config.yaml has the contents similar to the following. The
+ldap-config-flags value uses a json like string for the key value pairs:
+
+keystone-ldap:
+    ldap-config-flags: "{
+            user_tree_dn: 'DC=dc1,DC=ad,DC=example,DC=com',
+            user_filter: '(memberOf=CN=users-cn,OU=Groups,DC=dc1,DC=ad,DC=example,DC=com)',
+            query_scope: sub,
+            user_objectclass: person,
+            user_name_attribute: sAMAccountName,
+            user_id_attribute: sAMAccountName,
+            user_mail_attribute: mail,
+            user_enabled_attribute: userAccountControl,
+            user_enabled_mask: 2,
+            user_enabled_default: 512,
+            user_attribute_ignore: 'password,tenant_id,tenants',
+            user_allow_create: False,
+            user_allow_update: False,
+            user_allow_delete: False,
+            }"
+
+Note: The double quotes and braces around the whole string. And single quotes
+around the individual complex values.
 
 # Bugs
 
