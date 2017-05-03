@@ -53,7 +53,7 @@ class KeystoneLDAPCharm(charms_openstack.charm.OpenStackCharm):
     release = 'mitaka'
 
     # List of packages to install for this charm
-    packages = ['python-ldap', 'python-ldappool']
+    packages = ['python-ldappool']
 
     configuration_class = KeystoneLDAPConfigurationAdapter
 
