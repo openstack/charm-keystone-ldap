@@ -16,6 +16,8 @@ import unittest
 
 import mock
 
+from charms_openstack.test_mocks import charmhelpers as ch
+ch.contrib.openstack.utils.OPENSTACK_RELEASES = ('mitaka', )
 import charm.openstack.keystone_ldap as keystone_ldap
 
 

@@ -26,11 +26,19 @@ charm.use_defaults(
 
 
 @reactive.when('domain-backend.connected')
+@reactive.when_not('domain-name-configured')
 @reactive.when('config.complete')
 def configure_domain_name(domain):
     keystone_ldap.render_config(domain.trigger_restart)
     domain.domain_name(hookenv.config('domain-name') or
                        hookenv.service_name())
+    reactive.set_state('domain-name-configured')
+
+
+@reactive.when_not('domain-backend.connected')
+@reactive.when('domain-name-configured')
+def clear_domain_name_configured(domain):
+    reactive.remove_state('domain-name-configured')
 
 
 @reactive.when_not('always.run')
