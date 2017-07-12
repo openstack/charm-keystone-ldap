@@ -13,8 +13,6 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-import os
-
 import charmhelpers.contrib.openstack.amulet.deployment as amulet_deployment
 import charmhelpers.contrib.openstack.amulet.utils as os_amulet_utils
 
@@ -31,8 +29,10 @@ class KeystoneLDAPCharmDeployment(amulet_deployment.OpenStackAmuletDeployment):
                                                           source, stable)
         self._add_services()
         self._add_relations()
-        self._configure_services()
         self._deploy()
+        # Run the configure post-deploy to get the ldap-server's IP
+        # for use by keystone-ldap
+        self._configure_services()
 
         u.log.info('Waiting on extended status checks...')
         exclude_services = ['mysql', 'mongodb']
@@ -51,9 +51,14 @@ class KeystoneLDAPCharmDeployment(amulet_deployment.OpenStackAmuletDeployment):
         other_services = [
             {'name': 'keystone'},
             {'name': 'percona-cluster', 'constraints': {'mem': '3072M'}},
+            {'name': 'ldap-server',
+             'location': 'cs:~openstack-charmers/ldap-test-fixture'},
         ]
-        super(KeystoneLDAPCharmDeployment, self)._add_services(this_service,
-                                                               other_services)
+        super(KeystoneLDAPCharmDeployment, self)._add_services(
+            this_service,
+            other_services,
+            no_origin=['keystone-ldap', 'ldap-server']
+        )
 
     def _add_relations(self):
         """Add all of the relations for the services."""
@@ -84,11 +89,14 @@ class KeystoneLDAPCharmDeployment(amulet_deployment.OpenStackAmuletDeployment):
 
     def _get_ldap_config(self):
         # NOTE(jamespage): use amulet variables for CI specific config
+        self.ldap_server_sentry = self.d.sentry['ldap-server'][0]
+        self.ldap_server_ip = self.ldap_server_sentry.info['public-address']
+
         keystone_ldap_config = {
-            'ldap-server': os.environ.get('AMULET_LDAP_SERVER'),
-            'ldap-user': os.environ.get('AMULET_LDAP_USER'),
-            'ldap-password': os.environ.get('AMULET_LDAP_PASSWORD'),
-            'ldap-suffix': os.environ.get('AMULET_LDAP_SUFFIX'),
+            'ldap-server': "ldap://{}".format(self.ldap_server_ip),
+            'ldap-user': 'cn=admin,dc=test,dc=com',
+            'ldap-password': 'crapper',
+            'ldap-suffix': 'dc=test,dc=com',
             'domain-name': 'userdomain',
         }
         if all(keystone_ldap_config.values()):
@@ -134,6 +142,7 @@ class KeystoneLDAPCharmDeployment(amulet_deployment.OpenStackAmuletDeployment):
         else:
             return u.authenticate_keystone_admin(self.keystone_sentry,
                                                  user='admin',
+                                                 project_name='admin',
                                                  password='openstack',
                                                  api_version=api_version,
                                                  keystone_ip=keystone_ip)
@@ -158,8 +167,8 @@ class KeystoneLDAPCharmDeployment(amulet_deployment.OpenStackAmuletDeployment):
         # NOTE(jamespage): Test fixture should have johndoe and janedoe
         #                  accounts
         johndoe = self.find_keystone_v3_user(self.keystone,
-                                             'johndoe', 'keystone-ldap')
+                                             'john doe', 'userdomain')
         assert johndoe is not None
         janedoe = self.find_keystone_v3_user(self.keystone,
-                                             'janedoe', 'keystone-ldap')
+                                             'jane doe', 'userdomain')
         assert janedoe is not None
