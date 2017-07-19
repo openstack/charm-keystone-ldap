@@ -37,7 +37,7 @@ def configure_domain_name(domain):
 
 @reactive.when_not('domain-backend.connected')
 @reactive.when('domain-name-configured')
-def clear_domain_name_configured(domain):
+def clear_domain_name_configured(*args):
     reactive.remove_state('domain-name-configured')
 
 
