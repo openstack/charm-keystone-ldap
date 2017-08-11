@@ -14,6 +14,9 @@ from __future__ import print_function
 
 import mock
 
+from charms_openstack.test_mocks import charmhelpers as ch
+ch.contrib.openstack.utils.OPENSTACK_RELEASES = ('mitaka', )
+
 import reactive.keystone_ldap_handlers as handlers
 
 import charms_openstack.test_utils as test_utils
@@ -29,9 +32,12 @@ class TestRegisteredHooks(test_utils.TestRegisteredHooks):
             'when': {
                 'configure_domain_name': ('domain-backend.connected',
                                           'config.complete'),
+                'clear_domain_name_configured': ('domain-name-configured', ),
             },
             'when_not': {
-                'check_configuration': ('always.run',),
+                'check_configuration': ('always.run', ),
+                'configure_domain_name': ('domain-name-configured', ),
+                'clear_domain_name_configured': ('domain-backend.connected', ),
             }
         }
         # test that the hooks were registered via the
@@ -54,6 +60,7 @@ class TestKeystoneLDAPCharmHandlers(test_utils.PatchHelper):
         self.patch(handlers.keystone_ldap, 'render_config')
         self.patch(handlers.hookenv, 'config')
         self.patch(handlers.hookenv, 'service_name')
+        self.patch(handlers.reactive, 'set_state')
         self.config.return_value = None
         self.service_name.return_value = 'keystone-ldap'
         domain = mock.MagicMock()
@@ -64,6 +71,13 @@ class TestKeystoneLDAPCharmHandlers(test_utils.PatchHelper):
         domain.domain_name.assert_called_with(
             'keystone-ldap'
         )
+        self.set_state.assert_called_once_with('domain-name-configured')
+
+    def test_clear_domain_name_configured(self):
+        self.patch(handlers.reactive, 'remove_state')
+        domain = mock.MagicMock()
+        handlers.clear_domain_name_configured(domain)
+        self.remove_state.assert_called_once_with('domain-name-configured')
 
     def test_configure_domain_name_config(self):
         self.patch(handlers.keystone_ldap, 'render_config')
