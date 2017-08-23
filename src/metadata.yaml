@@ -17,7 +17,6 @@ series:
   - xenial
   - zesty
   - trusty
-  - yakkety
 provides:
   domain-backend:
     interface: keystone-domain-backend
