@@ -5,3 +5,4 @@ interfaces
 .testrepository
 *__pycache__*
 *.pyc
+.stestr

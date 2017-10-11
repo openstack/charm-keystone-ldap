@@ -88,13 +88,14 @@ class TestKeystoneLDAPCharm(Helper):
         self.assertEqual('/etc/keystone/domains/keystone.userdomain.conf',
                          charm.configuration_file)
 
+    @mock.patch('charmhelpers.contrib.openstack.utils.snap_install_requested')
     @mock.patch('charmhelpers.core.hookenv.config')
     @mock.patch('charmhelpers.core.hookenv.status_set')
     @mock.patch('charmhelpers.core.hookenv.application_version_set')
     def test_assess_status(self,
                            application_version_set,
                            status_set,
-                           config):
+                           config, snap_install_requested):
         reply = {
             'ldap-server': 'myserver',
             'ldap-user': 'myusername',
@@ -108,6 +109,7 @@ class TestKeystoneLDAPCharm(Helper):
             return reply
         config.side_effect = mock_config
 
+        snap_install_requested.return_value = False
         # Check that active status is set correctly
         keystone_ldap.assess_status()
         status_set.assert_called_with('active', mock.ANY)
