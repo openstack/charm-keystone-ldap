@@ -15,8 +15,8 @@ tags:
   - identity
 series:
   - xenial
+  - bionic
   - artful
-  - zesty
   - trusty
 provides:
   domain-backend:

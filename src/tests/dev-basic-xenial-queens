@@ -14,10 +14,11 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-"""Amulet tests on a basic Keystone LDAP Charm deployment on zesty-ocata."""
+"""Amulet tests on a basic Keystone LDAP Charm deployment on xenial-mitaka."""
 
 from basic_deployment import KeystoneLDAPCharmDeployment
 
 if __name__ == '__main__':
-    deployment = KeystoneLDAPCharmDeployment(series='zesty')
+    deployment = KeystoneLDAPCharmDeployment(series='xenial',
+                                             openstack='cloud:xenial-queens')
     deployment.run_tests()
