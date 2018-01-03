@@ -41,6 +41,13 @@ def clear_domain_name_configured(*args):
     reactive.remove_state('domain-name-configured')
 
 
+@reactive.when('domain-backend.connected')
+@reactive.when('domain-name-configured')
+@reactive.when('config.complete')
+def config_changed(domain):
+    keystone_ldap.render_config(domain.trigger_restart)
+
+
 @reactive.when_not('always.run')
 def check_configuration():
     '''Validate required configuration options at set state'''

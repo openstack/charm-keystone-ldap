@@ -33,6 +33,9 @@ class TestRegisteredHooks(test_utils.TestRegisteredHooks):
                 'configure_domain_name': ('domain-backend.connected',
                                           'config.complete'),
                 'clear_domain_name_configured': ('domain-name-configured', ),
+                'config_changed': ('domain-backend.connected',
+                                   'config.complete',
+                                   'domain-name-configured'),
             },
             'when_not': {
                 'check_configuration': ('always.run', ),
