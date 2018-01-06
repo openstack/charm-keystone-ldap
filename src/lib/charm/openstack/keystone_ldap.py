@@ -35,6 +35,7 @@ from charms_openstack.charm.core import (
 OPENSTACK_RELEASE_KEY = 'charmers.openstack-release-version'
 
 DOMAIN_CONF = "/etc/keystone/domains/keystone.{}.conf"
+BACKEND_CA_CERT = "/usr/share/ca-certificates/{}.crt"
 KEYSTONE_CONF_TEMPLATE = "keystone.conf"
 
 
@@ -64,6 +65,15 @@ class KeystoneLDAPConfigurationAdapter(
         return os_utils.config_flags_parser(
             hookenv.config('ldap-config-flags')
         )
+
+    @property
+    def backend_ca_file(self):
+        return BACKEND_CA_CERT.format(hookenv.service_name())
+
+    @property
+    def use_tls(self):
+        ldap_srv = hookenv.config('ldap-server')
+        return not ldap_srv.startswith('ldaps') if ldap_srv else False
 
 
 class KeystoneLDAPCharm(charms_openstack.charm.OpenStackCharm):
@@ -104,6 +114,7 @@ class KeystoneLDAPCharm(charms_openstack.charm.OpenStackCharm):
             'ldap_password': hookenv.config('ldap-password'),
             'ldap_suffix': hookenv.config('ldap-suffix'),
         }
+
         return all(required_config.values())
 
     @property
@@ -131,7 +142,22 @@ class KeystoneLDAPCharm(charms_openstack.charm.OpenStackCharm):
                 'templates/', self.release),
             target=self.configuration_file,
             context=self.adapters_instance)
-        if checksum != ch_host.file_hash(self.configuration_file):
+
+        tmpl_changed = (checksum !=
+                        ch_host.file_hash(self.configuration_file))
+
+        cert = hookenv.config('tls-ca-ldap')
+
+        cert_changed = False
+        if cert:
+            ca_file = self.options.backend_ca_file
+            old_cert_csum = ch_host.file_hash(ca_file)
+            ch_host.write_file(ca_file, cert,
+                               owner='root', group='root', perms=0o644)
+            cert_csum = ch_host.file_hash(ca_file)
+            cert_changed = (old_cert_csum != cert_csum)
+
+        if tmpl_changed or cert_changed:
             restart_trigger()
 
     def remove_config(self):
@@ -141,3 +167,7 @@ class KeystoneLDAPCharm(charms_openstack.charm.OpenStackCharm):
         """
         if os.path.exists(self.configuration_file):
             os.unlink(self.configuration_file)
+
+        if (hookenv.config('tls-ca-ldap') and
+           os.path.exists(self.options.backend_ca_file)):
+            os.unlink(self.options.backend_ca_file)

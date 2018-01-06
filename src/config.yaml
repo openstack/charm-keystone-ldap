@@ -7,9 +7,15 @@ options:
     type: string
     default:
     description: |
-      LDAP server URL for keystone identity backend.
-      .
-      Example: ldap://10.10.10.10/
+      LDAP server URL for keystone LDAP identity backend.
+
+      Examples:
+      ldap://10.10.10.10/
+      ldaps://10.10.10.10/
+      ldap://example.com:389,ldaps://ldaps.example.com:636
+
+      Usage of ldap:// urls with tls_ca_ldap option specified or certificates relation
+      presence will result in mandatory StartTLS usage.
   ldap-user:
     type: string
     default:
@@ -42,3 +48,13 @@ options:
     type: boolean
     default: True
     description: LDAP identity server backend readonly to keystone.
+  tls-ca-ldap:
+    type: string
+    default: null
+    description: |
+      This option controls which certificate (or a chain) will be used to connect
+      to an ldap server(s) over TLS. Certificate contents should be either used
+      directly or included via include-file://
+      An LDAP url should also be considered as ldaps and StartTLS are both valid
+      methods of using TLS (see RFC 4513) with StartTLS using a non-ldaps url which,
+      of course, still requires a CA certificate.
