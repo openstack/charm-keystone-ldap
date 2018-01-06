@@ -23,9 +23,34 @@ import charmhelpers.contrib.openstack.utils as os_utils
 import charms_openstack.charm
 import charms_openstack.adapters
 
+import os
+
+# release detection is done via keystone package given that
+# openstack-origin is not present in the subordinate charm
+# see https://github.com/juju/charm-helpers/issues/83
+import charmhelpers.core.unitdata as unitdata
+from charms_openstack.charm.core import (
+    register_os_release_selector
+)
+OPENSTACK_RELEASE_KEY = 'charmers.openstack-release-version'
 
 DOMAIN_CONF = "/etc/keystone/domains/keystone.{}.conf"
 KEYSTONE_CONF_TEMPLATE = "keystone.conf"
+
+
+@register_os_release_selector
+def select_release():
+    """Determine the release based on the keystone package version.
+
+    Note that this function caches the release after the first install so
+    that it doesn't need to keep going and getting it from the package
+    information.
+    """
+    release_version = unitdata.kv().get(OPENSTACK_RELEASE_KEY, None)
+    if release_version is None:
+        release_version = os_utils.os_release('keystone')
+        unitdata.kv().set(OPENSTACK_RELEASE_KEY, release_version)
+    return release_version
 
 
 class KeystoneLDAPConfigurationAdapter(
@@ -66,7 +91,8 @@ class KeystoneLDAPCharm(charms_openstack.charm.OpenStackCharm):
         """
         return hookenv.config('domain-name') or hookenv.service_name()
 
-    def configuration_complete(self):
+    @staticmethod
+    def configuration_complete():
         """Determine whether sufficient configuration has been provided
         to configure keystone for use with a LDAP backend
 
@@ -98,38 +124,20 @@ class KeystoneLDAPCharm(charms_openstack.charm.OpenStackCharm):
     def render_config(self, restart_trigger):
         """Render the domain specific LDAP configuration for the application
         """
-        checksum = ch_host.path_hash(self.configuration_file)
+        checksum = ch_host.file_hash(self.configuration_file)
         core.templating.render(
             source=KEYSTONE_CONF_TEMPLATE,
             template_loader=os_templating.get_loader(
                 'templates/', self.release),
             target=self.configuration_file,
             context=self.adapters_instance)
-        if checksum != ch_host.path_hash(self.configuration_file):
+        if checksum != ch_host.file_hash(self.configuration_file):
             restart_trigger()
 
-
-def render_config(restart_trigger):
-    """Render the configuration for the charm
-
-    :params: restart_trigger: function to call if configuration file
-                              changed as a result of rendering
-    """
-    KeystoneLDAPCharm.singleton.render_config(restart_trigger)
-
-
-def assess_status():
-    """Just call the KeystoneLDAPCharm.singleton.assess_status() command
-    to update status on the unit.
-    """
-    KeystoneLDAPCharm.singleton.assess_status()
-
-
-def configuration_complete():
-    """Determine whether charm configuration is actually complete"""
-    return KeystoneLDAPCharm.singleton.configuration_complete()
-
-
-def configuration_file():
-    """Configuration file for current domain configuration"""
-    return KeystoneLDAPCharm.singleton.configuration_file
+    def remove_config(self):
+        """
+        Remove the domain-specific LDAP configuration file and trigger
+        keystone restart.
+        """
+        if os.path.exists(self.configuration_file):
+            os.unlink(self.configuration_file)
