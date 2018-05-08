@@ -122,26 +122,12 @@ class KeystoneLDAPCharmDeployment(amulet_deployment.OpenStackAmuletDeployment):
         self.keystone_ip = self.keystone_sentry.relation(
             'shared-db',
             'percona-cluster:shared-db')['private-address']
-        # Authenticate admin with keystone endpoint
-        self.keystone = self.get_keystone_client(api_version=3)
 
-    def get_keystone_client(self, api_version=None, keystone_ip=None):
-        if keystone_ip is None:
-            keystone_ip = self.keystone_ip
-        if api_version == 2:
-            return u.authenticate_keystone_admin(self.keystone_sentry,
-                                                 user='admin',
-                                                 password='openstack',
-                                                 tenant='admin',
-                                                 api_version=api_version,
-                                                 keystone_ip=keystone_ip)
-        else:
-            return u.authenticate_keystone_admin(self.keystone_sentry,
-                                                 user='admin',
-                                                 password='openstack',
-                                                 project_name='admin',
-                                                 api_version=api_version,
-                                                 keystone_ip=keystone_ip)
+        # Authenticate admin with keystone
+        self.keystone_session, self.keystone = u.get_default_keystone_session(
+            self.keystone_sentry,
+            openstack_release=self._get_openstack_release(),
+            api_version=3)
 
     def find_keystone_v3_user(self, client, username, domain):
         """Find a user within a specified keystone v3 domain"""
