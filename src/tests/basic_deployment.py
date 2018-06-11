@@ -23,7 +23,7 @@ u = os_amulet_utils.OpenStackAmuletUtils(os_amulet_utils.DEBUG)
 class KeystoneLDAPCharmDeployment(amulet_deployment.OpenStackAmuletDeployment):
     """Amulet tests on a basic sdn_charm deployment."""
 
-    def __init__(self, series, openstack=None, source=None, stable=False):
+    def __init__(self, series, openstack=None, source=None, stable=True):
         """Deploy the entire test environment."""
         super(KeystoneLDAPCharmDeployment, self).__init__(series, openstack,
                                                           source, stable)
