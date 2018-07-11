@@ -16,7 +16,7 @@ tags:
 series:
   - xenial
   - bionic
-  - artful
+  - cosmic
   - trusty
 provides:
   domain-backend:
