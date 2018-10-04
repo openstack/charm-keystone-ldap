@@ -14,7 +14,7 @@
 # limitations under the License.
 
 # import to trigger openstack charm metaclass init
-import charm.openstack.keystone_ldap # noqa
+import charm.openstack.keystone_ldap  # noqa
 
 import charms_openstack.charm as charm
 import charms.reactive as reactive
