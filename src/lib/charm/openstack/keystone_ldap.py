@@ -128,6 +128,10 @@ class KeystoneLDAPCharm(charms_openstack.charm.OpenStackCharm):
         if not self.configuration_complete():
             hookenv.status_set('blocked',
                                'LDAP configuration incomplete')
+        elif os_utils.is_unit_upgrading_set():
+            hookenv.status_set('blocked',
+                               'Ready for do-release-upgrade and reboot. '
+                               'Set complete when finished.')
         else:
             hookenv.status_set('active',
                                'Unit is ready')

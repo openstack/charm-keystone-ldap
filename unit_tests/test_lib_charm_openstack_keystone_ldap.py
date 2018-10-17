@@ -78,6 +78,7 @@ class TestKeystoneLDAPCharm(Helper):
                 '/etc/keystone/domains/keystone.userdomain.conf',
                 kldap_charm.configuration_file)
 
+    @mock.patch('charmhelpers.contrib.openstack.utils.is_unit_upgrading_set')
     @mock.patch('charmhelpers.contrib.openstack.utils.snap_install_requested')
     @mock.patch('charmhelpers.core.hookenv.config')
     @mock.patch('charmhelpers.core.hookenv.status_set')
@@ -85,7 +86,8 @@ class TestKeystoneLDAPCharm(Helper):
     def test_assess_status(self,
                            application_version_set,
                            status_set,
-                           config, snap_install_requested):
+                           config, snap_install_requested,
+                           is_unit_upgrading_set):
         reply = {
             'ldap-server': 'myserver',
             'ldap-user': 'myusername',
@@ -100,6 +102,7 @@ class TestKeystoneLDAPCharm(Helper):
         config.side_effect = mock_config
 
         snap_install_requested.return_value = False
+        is_unit_upgrading_set.return_value = False
 
         with provide_charm_instance() as kldap_charm:
             # Check that active status is set correctly
