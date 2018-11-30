@@ -175,3 +175,18 @@ class KeystoneLDAPCharm(charms_openstack.charm.OpenStackCharm):
         if (hookenv.config('tls-ca-ldap') and
            os.path.exists(self.options.backend_ca_file)):
             os.unlink(self.options.backend_ca_file)
+
+
+class KeystoneLDAPCharmRocky(KeystoneLDAPCharm):
+
+    # First release supported
+    release = 'rocky'
+
+    # List of packages to install for this charm
+    # Explicitly install python3-ldap so python3-ldappool does not install
+    # python-ldap
+    packages = ['python3-ldap', 'python3-ldappool']
+
+    purge_packages = ['python-ldap', 'python-ldappool']
+
+    python_version = 3

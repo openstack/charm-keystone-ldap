@@ -15,7 +15,7 @@ from __future__ import print_function
 import mock
 
 from charms_openstack.test_mocks import charmhelpers as ch
-ch.contrib.openstack.utils.OPENSTACK_RELEASES = ('mitaka', )
+ch.contrib.openstack.utils.OPENSTACK_RELEASES = ('mitaka', 'rocky')
 
 import reactive.keystone_ldap_handlers as handlers
 
