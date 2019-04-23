@@ -1,4 +1,4 @@
 - project:
     templates:
-      - python35-charm-jobs
+      - python36-charm-jobs
       - openstack-cover-jobs
