@@ -50,7 +50,7 @@ class KeystoneLDAPCharmDeployment(amulet_deployment.OpenStackAmuletDeployment):
         this_service = {'name': 'keystone-ldap'}
         other_services = [
             {'name': 'keystone'},
-            {'name': 'percona-cluster'},
+            self.get_percona_service_entry(),
             {'name': 'ldap-server',
              'location': 'cs:~openstack-charmers/ldap-test-fixture'},
         ]
