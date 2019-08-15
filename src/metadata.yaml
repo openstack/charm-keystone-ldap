@@ -16,8 +16,8 @@ tags:
 series:
   - xenial
   - bionic
-  - cosmic
   - disco
+  - eoan
   - trusty
 provides:
   domain-backend:
