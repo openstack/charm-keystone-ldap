@@ -14,7 +14,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-"""Amulet tests on a basic Keystone LDAP Charm deployment on bionic-mitaka."""
+"""Amulet tests on a basic Keystone LDAP Charm deployment on bionic-rocky."""
 
 from basic_deployment import KeystoneLDAPCharmDeployment
 
