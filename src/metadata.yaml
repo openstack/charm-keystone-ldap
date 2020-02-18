@@ -16,7 +16,6 @@ tags:
 series:
   - xenial
   - bionic
-  - disco
   - eoan
   - trusty
 provides:
