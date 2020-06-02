@@ -2,23 +2,21 @@ name: keystone-ldap
 subordinate: true
 maintainer: OpenStack Charmers <openstack-charmers@lists.ubuntu.com>
 summary: Keystone Domain backend for LDAP or Active Directory
-description:
-  Keystone v3 deployments support the use of domain specific identity
-  drivers, allowing different types of authentication backend to be
-  deployed in a single Keystone deployment.
-  .
-  This charm supports use of LDAP or Active Directory domain backends,
+description: Keystone v3 deployments support the use of domain specific identity drivers,
+  allowing different types of authentication backend to be deployed in a single Keystone
+  deployment. . This charm supports use of LDAP or Active Directory domain backends,
   with configuration details provided by charm configuration options.
 tags:
-  - openstack
-  - ldap
-  - identity
+- openstack
+- ldap
+- identity
 series:
-  - xenial
-  - bionic
-  - eoan
-  - focal
-  - trusty
+- xenial
+- bionic
+- eoan
+- focal
+- trusty
+- groovy
 provides:
   domain-backend:
     interface: keystone-domain-backend
