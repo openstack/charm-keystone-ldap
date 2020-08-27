@@ -60,11 +60,34 @@ class KeystoneLDAPConfigurationAdapter(
     config flag parsing
     '''
 
-    @property
-    def ldap_options(self):
-        return os_utils.config_flags_parser(
-            hookenv.config('ldap-config-flags')
-        )
+    def __init__(self, charm_instance=None):
+        super(KeystoneLDAPConfigurationAdapter,
+              self).__init__(charm_instance=self)
+
+        # Return if ldap-config-flags is not set or empty string
+        ldap_config_flags = hookenv.config('ldap-config-flags')
+        if ldap_config_flags is None or ldap_config_flags == '':
+            self.ldap_options = {}
+            return
+
+        self.ldap_options = os_utils.config_flags_parser(ldap_config_flags)
+        # Get all the options that starts with ldap_
+        filtered_options = [k for k in vars(self) if k.startswith('ldap_')]
+        for cfg_opt in filtered_options:
+            # We only override if the option is not empty
+            charm_opt = cfg_opt.replace("_", "-")
+            cfg_value = hookenv.config(charm_opt)
+            if cfg_value in (None, ''):
+                continue
+            ldap_opt = cfg_opt.replace('ldap_', '')
+            # Found a collision in ldap-config-flags
+            if ldap_opt in self.ldap_options:
+                hookenv.log(
+                    "LDAP config {} specified in ldap-config-flags is being "
+                    "overridden with the value specified in charm config "
+                    "{}".format(ldap_opt, charm_opt), level=hookenv.WARNING)
+                # Remove the one declared in ldap-config-flags
+                self.ldap_options.pop(ldap_opt)
 
     @property
     def backend_ca_file(self):

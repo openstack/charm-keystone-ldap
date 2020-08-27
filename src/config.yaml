@@ -44,6 +44,13 @@ options:
         user_allow_create: False,
         user_allow_delete: False}"
       See the README for more details.
+
+      Note: The explicitly defined ldap-* charm config options take precedence
+      over the same LDAP config option also specified in ldap-config-flags.
+
+      For example, if the LDAP config query_scope is defined in
+      ldap-query-scope as 'one' and in ldap-config-flags as
+      "{query_scope: 'sub'}" then the config query_scope is set to 'one'.
   ldap-readonly:
     type: boolean
     default: True
@@ -58,3 +65,147 @@ options:
       An LDAP url should also be considered as ldaps and StartTLS are both valid
       methods of using TLS (see RFC 4513) with StartTLS using a non-ldaps url which,
       of course, still requires a CA certificate.
+  ldap-query-scope:
+    type: string
+    default:
+    description: |
+      This option controls the scope level of data presented through LDAP.
+  ldap-user-tree-dn:
+    type: string
+    default:
+    description: |
+      This option sets the search base to use for the users.
+  ldap-user-filter:
+    type: string
+    default:
+    description: |
+      This option sets the LDAP search filter to use for the users.
+  ldap-user-objectclass:
+    type: string
+    default:
+    description: |
+      This option sets the LDAP object class for users.
+  ldap-user-id-attribute:
+    type: string
+    default:
+    description: |
+      This option sets the LDAP attribute mapped to User IDs in keystone.
+  ldap-user-name-attribute:
+    type: string
+    default:
+    description: |
+      This option sets the LDAP attribute mapped to User names in keystone.
+  ldap-user-enabled-attribute:
+    type: string
+    default:
+    description: |
+      This option sets the LDAP attribute mapped to the user enabled
+      attribute in keystone.
+  ldap-user-enabled-invert:
+    type: boolean
+    default:
+    description: |
+      Setting this option to True allows LDAP servers to use lock attributes.
+      This option has no effect when ldap-user-enabled-mask or
+      ldap-user-enabled-emulation are in use.
+  ldap-user-enabled-mask:
+    type: int
+    default:
+    description: |
+      Bitmask integer to select which bit indicates the enabled value if
+      the LDAP server represents enabled as a bit on an integer rather
+      than as a discrete boolean. If the option is set to 0, the mask is
+      not used. This option is typically used when ldap-user-enabled-attribute
+      is set to 'userAccessControl'.
+  ldap-user-enabled-default:
+    type: string
+    default:
+    description: |
+      The default value to enable users. The LDAP servers can use boolean or
+      bit in the user enabled attribute to indicate if a user is enabled or
+      disabled. If boolean is used by the ldap schema, then the appropriate
+      value for this option is 'True' or 'False'. If bit is used by the ldap
+      schema, this option should match an appropriate integer value based on
+      ldap-user-enabled-mask. Please note the integer value should be specified
+      as a string in quotes. This option is typically used when
+      ldap-user-enabled-attribute is set to 'userAccountControl'.
+
+      Example:
+      Configuration options to use for ldap schema with userAccountControl as
+      control attribute, uses bit 1 in control attribute to indicate
+      enablement.
+
+      ldap-user-enabled-attribute = "userAccountControl"
+      ldap-user-enabled-mask = 2
+      ldap-user-enabled-default = "512"
+
+      ldap-user-enabled-default should be set to integer value that represents
+      a user being enabled. For Active Directory, 512 represents Normal Account.
+
+      For more information on how to set up those config options, please refer
+      to the OpenStack docs on Keystone and LDAP integration at
+      https://docs.openstack.org/keystone/latest/admin/configuration.html#integrate-identity-back-end-with-ldap
+
+  ldap-user-enabled-emulation:
+    type: boolean
+    default:
+    description: |
+      If enabled, keystone uses an alternative method to determine if a user
+      is enabled or not by checking if they are a member of the group defined
+      by the ldap-user-enabled_emulation-dn option.
+  ldap-user-enabled-emulation-dn:
+    type: string
+    default:
+    description: |
+      DN of the group entry to hold enabled users when using enabled
+      emulation. Setting this option has no effect when
+      ldap-user-enabled-emulation is False.
+  ldap-group-tree-dn:
+    type: string
+    default:
+    description: |
+      This option sets the search base to use for the groups.
+  ldap-group-objectclass:
+    type: string
+    default:
+    description: |
+      This option sets the LDAP object class for groups.
+  ldap-group-id-attribute:
+    type: string
+    default:
+    description: |
+      This option sets the LDAP attribute mapped to group IDs in keystone.
+  ldap-group-member-attribute:
+    type: string
+    default:
+    description: |
+      This option sets the LDAP attribute that indicates user is a member
+      of the group.
+  ldap-group-members-are-ids:
+    type: boolean
+    default:
+    description: |
+      Enable this option if the members of group object class are keystone
+      user IDs rather than LDAP DNs.
+  ldap-use-pool:
+    type: boolean
+    default:
+    description: |
+      This option enables LDAP connection pooling.
+  ldap-pool-size:
+    type: int
+    default:
+    description: |
+      This option sets the size of LDAP connection pool.
+  ldap-pool-retry-max:
+    type: int
+    default:
+    description: |
+      This option allows to set the maximum number of retry attempts to connect
+      to LDAP server before aborting.
+  ldap-pool-connection-timeout:
+    type: int
+    default:
+    description: |
+      The connection timeout to use when pooling LDAP connections. A value of
+      -1 means the connection will never timeout.

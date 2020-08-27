@@ -69,6 +69,10 @@ keystone-ldap:
 Note: The double quotes and braces around the whole string. And single quotes
 around the individual complex values.
 
+Please refer to the OpenStack docs at [Keystone and LDAP integration page](https://docs.openstack.org/keystone/latest/admin/configuration.html#integrate-identity-back-end-with-ldap)
+for more information on how to set up the config options and at [Keystone LDAP config options reference](https://docs.openstack.org/keystone/latest/configuration/config-options.html#ldap)
+for more information on their default values.
+
 # Bugs
 
 Please report bugs on [Launchpad](https://bugs.launchpad.net/charm-keystone-ldap/+filebug).

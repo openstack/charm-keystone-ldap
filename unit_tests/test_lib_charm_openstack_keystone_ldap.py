@@ -295,11 +295,27 @@ class TestKeystoneLDAPAdapters(Helper):
                             config_flags_parser):
         reply = {
             'ldap-config-flags':
-                'user_id_attribute=cn,user_name_attribute=cn',
+                'user_id_attribute=cn,user_name_attribute=cn,'
+                'group_members_are_ids=False,query_scope=one,'
+                'use_pool=True',
+            'ldap-group-members-are-ids': True,
+            'ldap-user-name-attribute': 'sn',
+            'ldap-query-scope': '',
+            'ldap-use-pool': None,
         }
-        ldap_config = {
+
+        parsed_config_flags = {
             'user_id_attribute': 'cn',
-            'user_name_attribute': 'cn'
+            'user_name_attribute': 'cn',
+            'group_members_are_ids': False,
+            'query_scope': 'one',
+            'use_pool': True,
+        }
+
+        final_ldap_config_flags = {
+            'user_id_attribute': 'cn',
+            'query_scope': 'one',
+            'use_pool': True,
         }
 
         def mock_config(key=None):
@@ -307,11 +323,27 @@ class TestKeystoneLDAPAdapters(Helper):
                 return reply.get(key)
             return reply
         config.side_effect = mock_config
-        config_flags_parser.return_value = ldap_config
+        config_flags_parser.return_value = parsed_config_flags
         # verify that the class is created with a
         # KeystoneLDAPConfigurationAdapter
         adapter = keystone_ldap.KeystoneLDAPConfigurationAdapter()
         # ensure that the relevant things got put on.
-        self.assertEqual(ldap_config,
-                         adapter.ldap_options)
+        self.assertEqual(final_ldap_config_flags, adapter.ldap_options)
         self.assertTrue(config_flags_parser.called)
+
+    @mock.patch('charmhelpers.core.hookenv.config')
+    def test_config_adapter_empty(self, config):
+        reply = {
+            'ldap-config-flags': ''
+        }
+
+        def mock_config(key=None):
+            if key:
+                return reply.get(key)
+            return reply
+        config.side_effect = mock_config
+        # verify that the class is created with a
+        # KeystoneLDAPConfigurationAdapter
+        adapter = keystone_ldap.KeystoneLDAPConfigurationAdapter()
+        # ensure that the relevant things got put on.
+        self.assertEqual({}, adapter.ldap_options)
