@@ -14,10 +14,10 @@ gate_bundles:
   - bionic-train
   - bionic-ussuri
   - focal-ussuri
+  - focal-victoria
   - trusty-mitaka
 
 dev_bundles:
-  - focal-victoria
   - groovy-victoria
 
 target_deploy_status:
