@@ -175,6 +175,11 @@ options:
     default:
     description: |
       This option sets the LDAP attribute mapped to group IDs in keystone.
+  ldap-group-name-attribute:
+    type: string
+    default:
+    description: |
+      This option sets the LDAP attribute mapped to group names in keystone.
   ldap-group-member-attribute:
     type: string
     default:
