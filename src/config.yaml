@@ -2,7 +2,9 @@ options:
   domain-name:
     type: string
     default:
-    description: Name of the keystone domain to configure; defaults to the deployed application name.
+    description: |
+      Name of the keystone domain to configure; defaults to the deployed
+      application name.
   ldap-server:
     type: string
     default:
@@ -13,9 +15,12 @@ options:
       ldap://10.10.10.10/
       ldaps://10.10.10.10/
       ldap://example.com:389,ldaps://ldaps.example.com:636
+      ldap://active-directory-host.com:3268/
+      ldaps://active-directory-host.com:3269/
 
-      Usage of ldap:// urls with tls_ca_ldap option specified or certificates relation
-      presence will result in mandatory StartTLS usage.
+      An ldap:// URL will result in mandatory StartTLS usage if either the
+      charm's tls-ca-ldap option has been specified or if the 'certificates'
+      relation is present.
   ldap-user:
     type: string
     default:
