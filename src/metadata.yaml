@@ -14,8 +14,8 @@ series:
 - xenial
 - bionic
 - focal
-- trusty
 - groovy
+- hirsute
 provides:
   domain-backend:
     interface: keystone-domain-backend
