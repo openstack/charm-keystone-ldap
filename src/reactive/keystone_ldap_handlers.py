@@ -25,7 +25,9 @@ import charmhelpers.core.hookenv as hookenv
 
 charm.use_defaults(
     'charm.installed',
-    'update-status')
+    'update-status',
+    'upgrade-charm',
+)
 
 # if config has been changed we need to re-evaluate flags
 # config.changed is set and cleared (atexit) in layer-basic

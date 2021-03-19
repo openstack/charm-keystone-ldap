@@ -24,7 +24,9 @@ class TestRegisteredHooks(test_utils.TestRegisteredHooks):
     def test_hooks(self):
         defaults = [
             'charm.installed',
-            'update-status']
+            'update-status',
+            'upgrade-charm',
+        ]
         hook_set = {
             'when': {
                 'configure_domain_name': ('domain-backend.connected',
