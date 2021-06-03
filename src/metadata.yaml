@@ -16,6 +16,7 @@ series:
 - focal
 - groovy
 - hirsute
+- impish
 provides:
   domain-backend:
     interface: keystone-domain-backend
