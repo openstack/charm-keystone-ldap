@@ -12,7 +12,7 @@ gate_bundles:
   - focal-ussuri
   - focal-victoria
   - focal-wallaby
-  - groovy-victoria
+  - focal-xena
 
 dev_bundles:
   - trusty-mitaka
@@ -20,7 +20,9 @@ dev_bundles:
   - xenial-pike
   - xenial-queens
   - bionic-rocky
+  - groovy-victoria
   - hirsute-wallaby
+  - impish-xena
 
 target_deploy_status:
   keystone-ldap:
@@ -33,4 +35,5 @@ tests:
 
 tests_options:
   force_deploy:
-    - hirsute-wallaby
+    - groovy-victoria
+    - impish-xena
