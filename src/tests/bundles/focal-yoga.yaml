@@ -1,6 +1,8 @@
 variables:
   openstack-origin: &openstack-origin cloud:focal-yoga
 
+local_overlay_enabled: False
+
 series: focal
 
 comment:
@@ -53,7 +55,7 @@ applications:
     - '4'
 
   keystone-ldap:
-    charm: ../../../keystone-ldap
+    charm: ../../../keystone-ldap.charm
 
 relations:
   - - 'keystone:domain-backend'

@@ -14,7 +14,7 @@ dev_bundles:
 target_deploy_status:
   keystone-ldap:
     workload-status: blocked
-    workload-status-message: LDAP configuration incomplete
+    workload-status-message-prefix: LDAP configuration incomplete
 
 
 tests:
