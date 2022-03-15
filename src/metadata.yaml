@@ -11,11 +11,7 @@ tags:
 - ldap
 - identity
 series:
-- xenial
-- bionic
 - focal
-- groovy
-- hirsute
 - impish
 provides:
   domain-backend:
