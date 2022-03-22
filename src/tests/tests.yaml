@@ -7,8 +7,7 @@ gate_bundles:
   - focal-wallaby
   - focal-xena
 
-dev_bundles:
-  - impish-xena
+dev_bundles: []
 
 target_deploy_status:
   keystone-ldap:
@@ -20,5 +19,4 @@ tests:
   - zaza.openstack.charm_tests.keystone.tests.LdapExplicitCharmConfigTests
 
 tests_options:
-  force_deploy:
-    - impish-xena
+  force_deploy: []

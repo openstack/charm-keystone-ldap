@@ -12,7 +12,6 @@ tags:
 - identity
 series:
 - focal
-- impish
 provides:
   domain-backend:
     interface: keystone-domain-backend
