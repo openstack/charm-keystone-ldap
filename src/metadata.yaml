@@ -12,7 +12,7 @@ tags:
 - identity
 series:
 - focal
-- impish
+- jammy
 provides:
   domain-backend:
     interface: keystone-domain-backend
