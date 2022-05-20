@@ -4,25 +4,11 @@ smoke_bundles:
   - focal-ussuri
 
 gate_bundles:
-  - xenial-mitaka
-  - bionic-queens
-  - bionic-stein
   - bionic-train
   - bionic-ussuri
   - focal-ussuri
-  - focal-victoria
-  - focal-wallaby
-  - focal-xena
 
-dev_bundles:
-  - trusty-mitaka
-  - xenial-ocata
-  - xenial-pike
-  - xenial-queens
-  - bionic-rocky
-  - groovy-victoria
-  - hirsute-wallaby
-  - impish-xena
+dev_bundles: []
 
 target_deploy_status:
   keystone-ldap:
@@ -34,6 +20,4 @@ tests:
   - zaza.openstack.charm_tests.keystone.tests.LdapExplicitCharmConfigTests
 
 tests_options:
-  force_deploy:
-    - groovy-victoria
-    - impish-xena
+  force_deploy: []
