@@ -11,8 +11,8 @@ tags:
 - ldap
 - identity
 series:
-- focal
 - jammy
+- kinetic
 provides:
   domain-backend:
     interface: keystone-domain-backend
