@@ -26,12 +26,15 @@ options:
     default:
     description: |
       Username (Distinguished Name) used to bind to LDAP identity server.
-      .
+      For anonymous binding, leave ldap-user and ldap-password empty.
+
       Example: cn=admin,dc=test,dc=com
   ldap-password:
     type: string
     default:
-    description: Password of the LDAP identity server.
+    description: |
+      Password of the LDAP identity server.
+      For anonymous binding, leave ldap-user and ldap-password empty.
   ldap-suffix:
     type: string
     default:

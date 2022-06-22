@@ -133,8 +133,6 @@ class KeystoneLDAPCharm(charms_openstack.charm.OpenStackCharm):
         """
         required_config = {
             'ldap_server': hookenv.config('ldap-server'),
-            'ldap_user': hookenv.config('ldap-user'),
-            'ldap_password': hookenv.config('ldap-password'),
             'ldap_suffix': hookenv.config('ldap-suffix'),
         }
 

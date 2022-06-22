@@ -32,8 +32,6 @@ class TestKeystoneLDAPCharm(Helper):
     def test_required_configuration(self, config):
         reply = {
             'ldap-server': 'myserver',
-            'ldap-user': 'myusername',
-            'ldap-password': 'mypassword',
             'ldap-suffix': 'suffix'
         }
 

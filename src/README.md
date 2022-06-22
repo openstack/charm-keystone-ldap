@@ -73,7 +73,8 @@ A file-based configuration can be added post-deploy in this way:
 #### `ldap-password`
 
 The `ldap-password` option supplies the password associated with the LDAP user
-(given by option `ldap-user`).
+(given by option `ldap-user`). For anonymous binding, leave ldap-password and
+ldap-user blank.
 
 #### `ldap-server`
 
@@ -117,7 +118,8 @@ The `ldap-suffix` option states the LDAP server suffix to be used by Keystone.
 #### `ldap-user`
 
 The `ldap-user` option states the username (Distinguished Name) used to bind to
-the LDAP server (given by option `ldap-server`).
+the LDAP server (given by option `ldap-server`). For anonymous binding, leave
+ldap-user and ldap-password blank.
 
 # Deployment
 
