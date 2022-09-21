@@ -1,15 +1,15 @@
 charm_name: keystone-ldap
 
 smoke_bundles:
-  - focal-xena
+  - jammy-yoga
 
 gate_bundles:
-  - focal-xena
-  - impish-xena
+  - jammy-yoga
 
 dev_bundles:
-  - focal-yoga
   - jammy-yoga
+  - jammy-zed
+  - kinetic-zed
 
 target_deploy_status:
   keystone-ldap:
@@ -22,5 +22,4 @@ tests:
 
 tests_options:
   force_deploy:
-    - impish-xena
-    - jammy-yoga
+    - kinetic-zed
