@@ -1,5 +1,5 @@
 variables:
-  openstack-origin: &openstack-origin distro
+  openstack-origin: &openstack-origin cloud:jammy-antelope
 
 local_overlay_enabled: False
 
@@ -29,7 +29,6 @@ applications:
     charm: ch:mysql-innodb-cluster
     num_units: 3
     options:
-      source: *openstack-origin
       # Reduce chances of spurious "super-read-only" failures, see lp:1882205
       expel-timeout: 20
     to:
