@@ -12,8 +12,8 @@ tags:
 - identity
 series:
 - jammy
-- kinetic
 - lunar
+- mantic
 provides:
   domain-backend:
     interface: keystone-domain-backend
