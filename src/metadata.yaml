@@ -12,7 +12,6 @@ tags:
 - identity
 series:
 - jammy
-- lunar
 - mantic
 provides:
   domain-backend:
