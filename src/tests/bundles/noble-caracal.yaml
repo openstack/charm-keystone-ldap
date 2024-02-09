@@ -3,7 +3,7 @@ variables:
 
 local_overlay_enabled: False
 
-series: lunar
+series: noble
 
 comment:
   - 'machines section to decide order of deployment. database sooner = faster'
@@ -29,7 +29,6 @@ applications:
     charm: ch:mysql-innodb-cluster
     num_units: 3
     options:
-      source: *openstack-origin
       # Reduce chances of spurious "super-read-only" failures, see lp:1882205
       expel-timeout: 20
     to:
@@ -45,7 +44,7 @@ applications:
       openstack-origin: *openstack-origin
     to:
     - '3'
-    channel: latest/edge
+    channel: 2024.1/edge
 
   ldap-server:
     charm: cs:~openstack-charmers/ldap-test-fixture

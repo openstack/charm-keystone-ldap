@@ -7,13 +7,11 @@ description: Keystone v3 deployments support the use of domain specific identity
   deployment. . This charm supports use of LDAP or Active Directory domain backends,
   with configuration details provided by charm configuration options.
 tags:
-- openstack
-- ldap
-- identity
+  - openstack
+  - ldap
+  - identity
 series:
-- jammy
-- lunar
-- mantic
+  - jammy
 provides:
   domain-backend:
     interface: keystone-domain-backend
