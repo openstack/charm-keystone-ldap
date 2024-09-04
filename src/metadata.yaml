@@ -10,8 +10,6 @@ tags:
   - openstack
   - ldap
   - identity
-series:
-  - jammy
 provides:
   domain-backend:
     interface: keystone-domain-backend
