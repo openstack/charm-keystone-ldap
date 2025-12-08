@@ -11,6 +11,8 @@
 #
 cryptography<3.4
 
+looseversion  # distutils.version.LooseVersion replacement for Python 3.12+
+
 git+https://github.com/juju/charm-tools.git
 
 simplejson

@@ -3,15 +3,21 @@
 # choices of *requirements.txt files for OpenStack Charms:
 #     https://github.com/openstack-charmers/release-tools
 #
+# pin setuptools to the version in noble/caracal.
+# Fixes: ModuleNotFoundError: No module named 'pkg_resources'
+setuptools==68.1.2
+
 pyparsing<3.0.0  # aodhclient is pinned in zaza and needs pyparsing < 3.0.0, but cffi also needs it, so pin here.
 
 stestr>=2.2.0
 
-# Dependency of stestr. Workaround for
-# https://github.com/mtreinish/stestr/issues/145
-cliff<3.0.0
-
 requests>=2.18.4
+
+# charm-helpers is installed before charms.reactive, because charms.reactive
+# depends on it and it will pull the version published in pypi, but we want to
+# use th version from git.
+git+https://github.com/juju/charm-helpers.git#egg=charmhelpers
+
 charms.reactive
 
 mock>=1.2

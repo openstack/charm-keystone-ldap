@@ -1,3 +1,6 @@
+# pin setuptools to the version in noble/caracal.
+# Fixes: ModuleNotFoundError: No module named 'pkg_resources'
+setuptools==68.1.2
 
 git+https://github.com/openstack/charms.openstack.git#egg=charms.openstack
 
