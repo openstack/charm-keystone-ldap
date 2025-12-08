@@ -76,6 +76,34 @@ The `ldap-password` option supplies the password associated with the LDAP user
 (given by option `ldap-user`). For anonymous binding, leave ldap-password and
 ldap-user blank.
 
+To pass the `ldap-password` as a secret stored in vault, pass the config value
+as `vault://<secret-name>`. The charm will automatically configure Castellan
+and the necessary config files.
+The Keystone-ldap charm must be related to Vault over the secrets-storage interface
+and the secret should be created in the KV mountpoint created by the secrets-storage relation (i.e. charm-keystone-ldap/*).
+
+Example:
+
+```
+# Relate vault and keystone-ldap
+juju integrate vault keystone-ldap:secrets-storage
+
+# Below is an example for creating a secret in vault for the password: "password$long@#"
+# Ensure the '$' character is escaped due to how oslo.config parses config files
+secret_encoded=$(echo -n 'password\$long@#' | xxd -p)
+
+vault write charm-keystone-ldap/ldap_password - <<EOF
+{
+  "type": "opaque",
+  "value": "$secret_encoded",
+  "name": "ldap_password",
+  "created": $(date +%s)
+}
+EOF
+
+juju config keystone-ldap ldap-password=="vault://ldap_password"
+```
+
 #### `ldap-server`
 
 The `ldap-server` option states the LDAP URL(s) of the Keystone LDAP identity

@@ -13,9 +13,11 @@
 # limitations under the License.
 
 import sys
+from unittest.mock import MagicMock
 
 sys.path.append('src')
 sys.path.append('src/lib')
+sys.modules['charmhelpers.contrib.openstack.vaultlocker'] = MagicMock()
 
 # Mock out charmhelpers so that we can test without it.
 import charms_openstack.test_mocks  # noqa
