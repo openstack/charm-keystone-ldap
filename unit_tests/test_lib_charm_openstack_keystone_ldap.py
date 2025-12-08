@@ -119,6 +119,7 @@ class TestKeystoneLDAPCharm(Helper):
     def test_render_config(self, config):
         self.patch_object(keystone_ldap.ch_host, 'file_hash')
         self.patch_object(keystone_ldap.core.templating, 'render')
+        self.patch_object(keystone_ldap.ch_host, 'system')
 
         reply = {
             'ldap-server': 'myserver',
@@ -134,23 +135,47 @@ class TestKeystoneLDAPCharm(Helper):
             return reply
         config.side_effect = mock_config
 
-        self.file_hash.side_effect = ['aaa', 'aaa']
+        self.file_hash.side_effect = ['aaa', 'aaa',
+                                      'aaa', 'aaa',
+                                      'aaa', 'aaa',
+                                      'aaa', 'aaa']
+
         mock_trigger = mock.MagicMock()
+
+        keystone_target = '/etc/keystone/domains/keystone.userdomain.conf'
+        castellan_target = '/etc/keystone/domains/castellan.userdomain.conf'
+        secret_map_target = '/etc/keystone/domains/secret_map.userdomain.conf'
+        override_target = ("/etc/systemd/system/apache2.service.d/"
+                           "override.userdomain.conf")
 
         with provide_charm_instance() as kldap_charm:
             # Ensure a basic level of function from render_config
             kldap_charm.render_config(mock_trigger)
-            self.render.assert_called_with(
-                source=keystone_ldap.KEYSTONE_CONF_TEMPLATE,
-                template_loader=mock.ANY,
-                target='/etc/keystone/domains/keystone.userdomain.conf',
-                context=mock.ANY
-            )
+            self.render.assert_has_calls([
+                mock.call(source=keystone_ldap.KEYSTONE_CONF_TEMPLATE,
+                          template_loader=mock.ANY,
+                          target=keystone_target,
+                          context=mock.ANY),
+                mock.call(source=keystone_ldap.CASTELLAN_CONF_TEMPLATE,
+                          template_loader=mock.ANY,
+                          target=castellan_target,
+                          context=mock.ANY),
+                mock.call(source=keystone_ldap.SECRET_MAP_CONF_TEMPLATE,
+                          template_loader=mock.ANY,
+                          target=secret_map_target,
+                          context=mock.ANY),
+                mock.call(source=keystone_ldap.OVERRIDE_CONF_TEMPLATE,
+                          template_loader=mock.ANY,
+                          target=override_target,
+                          context=mock.ANY),])
             self.assertFalse(mock_trigger.called)
 
             # Ensure that change in file contents results in call
             # to restart trigger function passed to render_config
-            self.file_hash.side_effect = ['aaa', 'bbb']
+            self.file_hash.side_effect = ['aaa', 'bbb',
+                                          'aaa', 'bbb',
+                                          'aaa', 'bbb',
+                                          'aaa', 'bbb']
             kldap_charm.render_config(mock_trigger)
             self.assertTrue(mock_trigger.called)
 
@@ -207,22 +232,41 @@ class TestKeystoneLDAPCharm(Helper):
         service_name.return_value = svc_name
 
         self.file_hash.side_effect = [
-            'templatehash',
-            'templatehash',
+            'templatehash', 'templatehash',
             'de3d5930e6e6b3fdb385f60a05206588',
             'de3d5930e6e6b3fdb385f60a05206588',
+            'castellanhash', 'castellanhash',
+            'secretmaphash', 'secretmaphash',
+            'overridehash', 'overridehash',
         ]
         mock_trigger = mock.MagicMock()
+
+        keystone_target = '/etc/keystone/domains/keystone.userdomain.conf'
+        castellan_target = '/etc/keystone/domains/castellan.userdomain.conf'
+        secret_map_target = '/etc/keystone/domains/secret_map.userdomain.conf'
+        override_target = ("/etc/systemd/system/apache2.service.d/"
+                           "override.userdomain.conf")
 
         with provide_charm_instance() as kldap_charm:
             # Ensure a basic level of function from render_config
             kldap_charm.render_config(mock_trigger)
-            self.render.assert_called_with(
-                source=keystone_ldap.KEYSTONE_CONF_TEMPLATE,
-                template_loader=mock.ANY,
-                target='/etc/keystone/domains/keystone.userdomain.conf',
-                context=mock.ANY
-            )
+            self.render.assert_has_calls([
+                mock.call(source=keystone_ldap.KEYSTONE_CONF_TEMPLATE,
+                          template_loader=mock.ANY,
+                          target=keystone_target,
+                          context=mock.ANY),
+                mock.call(source=keystone_ldap.CASTELLAN_CONF_TEMPLATE,
+                          template_loader=mock.ANY,
+                          target=castellan_target,
+                          context=mock.ANY),
+                mock.call(source=keystone_ldap.SECRET_MAP_CONF_TEMPLATE,
+                          template_loader=mock.ANY,
+                          target=secret_map_target,
+                          context=mock.ANY),
+                mock.call(source=keystone_ldap.OVERRIDE_CONF_TEMPLATE,
+                          template_loader=mock.ANY,
+                          target=override_target,
+                          context=mock.ANY),])
             self.write_file.assert_called_with(
                 keystone_ldap.BACKEND_CA_CERT.format(svc_name),
                 reply['tls-ca-ldap'],
@@ -235,10 +279,12 @@ class TestKeystoneLDAPCharm(Helper):
             # template file change leads to restart without a change
             # in a cert
             self.file_hash.side_effect = [
-                'oldtemplatehash',
-                'newtemplatehash',
+                'oldtemplatehash', 'newtemplatehash',
                 'de3d5930e6e6b3fdb385f60a05206588',
                 'de3d5930e6e6b3fdb385f60a05206588',
+                'castellanhash', 'castellanhash',
+                'secretmaphash', 'secretmaphash',
+                'overridehash', 'overridehash',
             ]
 
             kldap_charm.render_config(mock_trigger)
@@ -246,10 +292,12 @@ class TestKeystoneLDAPCharm(Helper):
 
             # cert change without template change
             self.file_hash.side_effect = [
-                'templatehash',
-                'templatehash',
+                'templatehash', 'templatehash',
                 'deadbeefdeadbeefdeadbeefdeadbeef',
                 'de3d5930e6e6b3fdb385f60a05206588',
+                'castellanhash', 'castellanhash',
+                'secretmaphash', 'secretmaphash',
+                'overridehash', 'overridehash',
             ]
             kldap_charm.render_config(mock_trigger)
             self.assertTrue(mock_trigger.called)
@@ -279,9 +327,21 @@ class TestKeystoneLDAPCharm(Helper):
         with provide_charm_instance() as kldap_charm:
             # Ensure a basic level of function from render_config
             cf = keystone_ldap.DOMAIN_CONF.format(reply['domain-name'])
+            castellan_cf = keystone_ldap.CASTELLAN_CONF.format(
+                reply['domain-name'])
+            secretmap_cf = keystone_ldap.SECRET_MAP_CONF.format(
+                reply['domain-name'])
+            override_cf = keystone_ldap.OVERRIDE_CONF.format(
+                reply['domain-name'])
             kldap_charm.remove_config()
-            exists.assert_called_once_with(cf)
-            unlink.assert_called_once_with(cf)
+            expected_calls = [
+                mock.call(cf),
+                mock.call(castellan_cf),
+                mock.call(secretmap_cf),
+                mock.call(override_cf),
+            ]
+            exists.assert_has_calls(expected_calls)
+            unlink.assert_has_calls(expected_calls)
 
 
 class TestKeystoneLDAPAdapters(Helper):

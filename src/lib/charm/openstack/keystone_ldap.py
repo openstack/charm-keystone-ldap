@@ -38,6 +38,15 @@ DOMAIN_CONF = "/etc/keystone/domains/keystone.{}.conf"
 BACKEND_CA_CERT = "/usr/share/ca-certificates/{}.crt"
 KEYSTONE_CONF_TEMPLATE = "keystone.conf"
 
+CASTELLAN_CONF = "/etc/keystone/domains/castellan.{}.conf"
+CASTELLAN_CONF_TEMPLATE = "castellan.conf"
+
+SECRET_MAP_CONF = "/etc/keystone/domains/secret_map.{}.conf"
+SECRET_MAP_CONF_TEMPLATE = "secret_map.conf"
+
+OVERRIDE_CONF = "/etc/systemd/system/apache2.service.d/override.{}.conf"
+OVERRIDE_CONF_TEMPLATE = "override.conf"
+
 
 @register_os_release_selector
 def select_release():
@@ -97,6 +106,25 @@ class KeystoneLDAPConfigurationAdapter(
     def use_tls(self):
         ldap_srv = hookenv.config('ldap-server')
         return not ldap_srv.startswith('ldaps') if ldap_srv else False
+
+    @property
+    def vault_kv(self):
+        return unitdata.kv().get('vault.kv.context', {}) or {}
+
+    @property
+    def keystone_ldap_password_is_vault(self):
+        pw = hookenv.config('ldap-password')
+        return isinstance(pw, str) and pw.startswith('vault://')
+
+    @property
+    def castellan_config_file(self):
+        domain_name = hookenv.config('domain-name') or hookenv.service_name()
+        return CASTELLAN_CONF.format(domain_name)
+
+    @property
+    def secret_map_config_file(self):
+        domain_name = hookenv.config('domain-name') or hookenv.service_name()
+        return SECRET_MAP_CONF.format(domain_name)
 
 
 class KeystoneLDAPCharm(charms_openstack.charm.OpenStackCharm):
@@ -182,7 +210,60 @@ class KeystoneLDAPCharm(charms_openstack.charm.OpenStackCharm):
             cert_csum = ch_host.file_hash(ca_file)
             cert_changed = (old_cert_csum != cert_csum)
 
-        if tmpl_changed or cert_changed:
+        vault_changed = False
+
+        # castellan.conf
+        castellan_old_checksum = ch_host.file_hash(
+            CASTELLAN_CONF.format(self.domain_name))
+        core.templating.render(
+            source=CASTELLAN_CONF_TEMPLATE,
+            template_loader=os_templating.get_loader(
+                'templates/', self.release),
+            target=CASTELLAN_CONF.format(self.domain_name),
+            context=self.adapters_instance)
+        castellan_new_checksum = ch_host.file_hash(
+            CASTELLAN_CONF.format(self.domain_name))
+
+        # secret_mapping.conf
+        secretmap_old_checksum = ch_host.file_hash(
+            SECRET_MAP_CONF.format(self.domain_name))
+        core.templating.render(
+            source=SECRET_MAP_CONF_TEMPLATE,
+            template_loader=os_templating.get_loader(
+                'templates/', self.release),
+            target=SECRET_MAP_CONF.format(self.domain_name),
+            context=self.adapters_instance)
+        secretmap_new_checksum = ch_host.file_hash(
+            SECRET_MAP_CONF.format(self.domain_name))
+
+        # override.conf
+        override_path = OVERRIDE_CONF.format(self.domain_name)
+        override_dir = os.path.dirname(override_path)
+        ch_host.mkdir(override_dir)
+
+        override_old_checksum = ch_host.file_hash(override_path)
+        core.templating.render(
+            source=OVERRIDE_CONF_TEMPLATE,
+            template_loader=os_templating.get_loader(
+                'templates/', self.release),
+            target=OVERRIDE_CONF.format(self.domain_name),
+            context=self.adapters_instance)
+        override_new_checksum = ch_host.file_hash(override_path)
+
+        # daemon-reload if override.conf changed
+        # Note that this will not trigger a restart of apache2
+        # The principal charm (keystone) will do this when ldap setup is done
+        if (override_old_checksum != override_new_checksum):
+            if not ch_host.system('daemon-reload'):
+                raise RuntimeError("Failed to reload systemd daemon")
+
+        vault_changed = (
+            castellan_old_checksum != castellan_new_checksum or
+            secretmap_old_checksum != secretmap_new_checksum or
+            override_old_checksum != override_new_checksum
+        )
+
+        if tmpl_changed or cert_changed or vault_changed:
             restart_trigger()
 
     def remove_config(self):
@@ -197,6 +278,19 @@ class KeystoneLDAPCharm(charms_openstack.charm.OpenStackCharm):
            os.path.exists(self.options.backend_ca_file)):
             os.unlink(self.options.backend_ca_file)
 
+        castellan_conf = CASTELLAN_CONF.format(self.domain_name)
+        if os.path.exists(castellan_conf):
+            os.unlink(castellan_conf)
+
+        secret_map_conf = SECRET_MAP_CONF.format(self.domain_name)
+        if os.path.exists(secret_map_conf):
+            os.unlink(secret_map_conf)
+
+        override_conf = OVERRIDE_CONF.format(self.domain_name)
+        if os.path.exists(override_conf):
+            os.unlink(override_conf)
+            ch_host.system('daemon-reload')
+
 
 class KeystoneLDAPCharmRocky(KeystoneLDAPCharm):
 
@@ -206,7 +300,7 @@ class KeystoneLDAPCharmRocky(KeystoneLDAPCharm):
     # List of packages to install for this charm
     # Explicitly install python3-ldap so python3-ldappool does not install
     # python-ldap
-    packages = ['python3-ldap', 'python3-ldappool']
+    packages = ['python3-ldap', 'python3-ldappool', 'python3-castellan']
 
     purge_packages = ['python-ldap', 'python-ldappool']
 

@@ -1,4 +1,4 @@
-includes: ['layer:openstack', 'interface:keystone-domain-backend', 'interface:juju-info']
+includes: ['layer:openstack', 'interface:keystone-domain-backend', 'interface:juju-info', 'interface:vault-kv']
 options:
   basic:
     use_venv: True

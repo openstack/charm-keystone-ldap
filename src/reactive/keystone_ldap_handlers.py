@@ -23,6 +23,11 @@ import charms.reactive.flags as flags
 
 import charmhelpers.core.hookenv as hookenv
 
+import charmhelpers.contrib.openstack.vaultlocker as vaultlocker
+import charmhelpers.core.unitdata as unitdata
+
+from socket import gethostname
+
 charm.use_defaults(
     'charm.installed',
     'update-status',
@@ -35,6 +40,54 @@ flags.register_trigger(when='config.changed',
                        clear_flag='config.rendered')
 flags.register_trigger(when='config.changed',
                        clear_flag='config.complete')
+
+VAULT_CTX_KEY = 'vault.kv.context'
+
+
+def _store_vault_context(ctxt):
+    db = unitdata.kv()
+    db.set(VAULT_CTX_KEY, ctxt)
+    db.flush()
+
+
+@reactive.when_not('secrets-storage.available')
+@reactive.when('secrets-storage.connected')
+def secrets_storage_connected():
+    """Request access to vault once relation is up."""
+    secrets = reactive.endpoint_from_flag('secrets-storage.connected')
+    hookenv.log('Requesting access to vault ({})'.format(secrets.vault_url),
+                level=hookenv.INFO)
+
+    try:
+        addr = hookenv.network_get_primary_address('secrets-storage')
+    except (hookenv.NoNetworkBinding, NotImplementedError):
+        addr = hookenv.unit_private_ip()
+
+    for relation in secrets.relations:
+        relation.to_publish['secret_backend'] = 'charm-keystone-ldap'
+        relation.to_publish['access_address'] = addr
+        relation.to_publish['hostname'] = gethostname()
+        relation.to_publish['isolated'] = False
+        relation.to_publish['unit_name'] = hookenv.local_unit()
+
+
+@reactive.when('secrets-storage.available')
+def secrets_storage_available():
+    """Unwrap secret-id and cache vault context for render."""
+    vault_ctxt = vaultlocker.VaultKVContext(
+        secret_backend='charm-keystone-ldap')()
+    if vault_ctxt:
+        _store_vault_context(vault_ctxt)
+        flags.clear_flag('config.rendered')
+
+
+@reactive.when_not('secrets-storage.connected')
+def secrets_storage_departed():
+    """Clear cached vault context if relation drops."""
+    db = unitdata.kv()
+    db.unset(VAULT_CTX_KEY)
+    db.flush()
+    flags.clear_flag('config.rendered')
 
 
 @reactive.when('domain-backend.connected')
