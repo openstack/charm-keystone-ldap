@@ -5,7 +5,7 @@
 #
 # pin setuptools to the version in noble/caracal.
 # Fixes: ModuleNotFoundError: No module named 'pkg_resources'
-setuptools==68.1.2
+setuptools==78.1.1
 
 pyparsing<3.0.0  # aodhclient is pinned in zaza and needs pyparsing < 3.0.0, but cffi also needs it, so pin here.
 
