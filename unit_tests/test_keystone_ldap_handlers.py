@@ -36,6 +36,8 @@ class TestRegisteredHooks(test_utils.TestRegisteredHooks):
                 'render_config': ('config.complete',
                                   'domain-backend.connected',
                                   'domain-name-configured'),
+                'secrets_storage_connected': ('secrets-storage.connected',),
+                'secrets_storage_available': ('secrets-storage.available',),
             },
             'when_not': {
                 'assess_status': ('always.run',),
@@ -43,6 +45,8 @@ class TestRegisteredHooks(test_utils.TestRegisteredHooks):
                 'keystone_departed': ('domain-backend.connected',),
                 'config_changed': ('config.complete',),
                 'render_config': ('config.rendered',),
+                'secrets_storage_connected': ('secrets-storage.available',),
+                'secrets_storage_departed': ('secrets-storage.connected',),
             }
         }
         # test that the hooks were registered via the
@@ -142,3 +146,62 @@ class TestKeystoneLDAPCharmHandlers(test_utils.PatchHelper):
         handlers.assess_status()
 
         kldap_charm.assess_status.assert_called_once()
+
+    def test__store_vault_context(self):
+        self.patch_object(handlers.unitdata, 'kv')
+        db = self.kv.return_value
+
+        ctxt = {'token': 'abc'}
+        handlers._store_vault_context(ctxt)
+
+        db.set.assert_called_once_with(handlers.VAULT_CTX_KEY, ctxt)
+        db.flush.assert_called_once_with()
+
+    def test_secrets_storage_connected(self):
+        relation = mock.MagicMock()
+        relation.to_publish = {}
+
+        endpoint = mock.MagicMock()
+        endpoint.relations = [relation]
+        endpoint.vault_url = 'http://vault:8200'
+
+        self.patch_object(handlers.reactive, 'endpoint_from_flag')
+        self.endpoint_from_flag.return_value = endpoint
+
+        self.patch_object(handlers.hookenv, 'network_get_primary_address')
+        self.network_get_primary_address.return_value = '10.0.0.5'
+
+        self.patch_object(handlers.hookenv, 'local_unit')
+        self.local_unit.return_value = 'keystone-ldap/0'
+
+        self.patch_object(handlers, 'gethostname')
+        self.gethostname.return_value = 'host1'
+
+        handlers.secrets_storage_connected()
+
+        self.assertEqual(
+            {
+                'secret_backend': 'charm-keystone-ldap',
+                'access_address': '10.0.0.5',
+                'hostname': 'host1',
+                'isolated': False,
+                'unit_name': 'keystone-ldap/0',
+            },
+            relation.to_publish,
+        )
+
+    def test_secrets_storage_available(self):
+        self.patch_object(handlers.vaultlocker, 'VaultKVContext')
+        self.patch_object(handlers, '_store_vault_context')
+        self.patch_object(handlers.flags, 'clear_flag')
+
+        ctxt = {'token': 'abc'}
+        self.VaultKVContext.return_value.return_value = ctxt
+
+        handlers.secrets_storage_available()
+
+        self.VaultKVContext.assert_called_once_with(
+            secret_backend='charm-keystone-ldap'
+        )
+        self._store_vault_context.assert_called_once_with(ctxt)
+        self.clear_flag.assert_called_once_with('config.rendered')

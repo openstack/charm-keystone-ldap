@@ -22,3 +22,6 @@ requires:
   container:
     interface: juju-info
     scope: container
+  secrets-storage:
+    interface: vault-kv
+    optional: true
