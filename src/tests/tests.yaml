@@ -9,7 +9,6 @@ gate_bundles:
 dev_bundles:
   - jammy-yoga
   - jammy-zed
-  - kinetic-zed
 
 target_deploy_status:
   keystone-ldap:
@@ -19,7 +18,3 @@ target_deploy_status:
 
 tests:
   - zaza.openstack.charm_tests.keystone.tests.LdapExplicitCharmConfigTests
-
-tests_options:
-  force_deploy:
-    - kinetic-zed

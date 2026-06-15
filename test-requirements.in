@@ -3,9 +3,7 @@
 # choices of *requirements.txt files for OpenStack Charms:
 #     https://github.com/openstack-charmers/release-tools
 #
-pyparsing<3.0.0  # aodhclient is pinned in zaza and needs pyparsing < 3.0.0, but cffi also needs it, so pin here.
-setuptools<50.0.0  # https://github.com/pypa/setuptools/commit/04e3df22df840c6bb244e9b27bc56750c44b7c85
-
+setuptools<82.0.0
 stestr>=2.2.0
 
 # Dependency of stestr. Workaround for
@@ -14,8 +12,6 @@ cliff<3.0.0
 
 requests>=2.18.4
 charms.reactive
-
-mock>=1.2
 
 nose>=1.3.7
 coverage>=3.6
@@ -36,3 +32,4 @@ cryptography<3.4 # vault, keystone-saml-mellon
 lxml             # keystone-saml-mellon
 hvac             # vault, barbican-vault
 psutil           # cinder-lvm
+flake8==7.1.1
