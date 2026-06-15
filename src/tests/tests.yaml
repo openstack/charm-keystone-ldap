@@ -8,7 +8,6 @@ gate_bundles:
 
 dev_bundles:
   - jammy-bobcat
-  - mantic-bobcat
 
 target_deploy_status:
   keystone-ldap:
@@ -18,7 +17,3 @@ target_deploy_status:
 
 tests:
   - zaza.openstack.charm_tests.keystone.tests.LdapExplicitCharmConfigTests
-
-tests_options:
-  force_deploy:
-    - mantic-bobcat
