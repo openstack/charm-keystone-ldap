@@ -3,7 +3,6 @@ charm_name: keystone-ldap
 smoke_bundles:
   - jammy-caracal
 gate_bundles:
-  - jammy-antelope
   - jammy-bobcat
   - jammy-caracal
 dev_bundles:

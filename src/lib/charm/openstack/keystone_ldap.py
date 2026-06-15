@@ -254,7 +254,7 @@ class KeystoneLDAPCharm(charms_openstack.charm.OpenStackCharm):
         # Note that this will not trigger a restart of apache2
         # The principal charm (keystone) will do this when ldap setup is done
         if (override_old_checksum != override_new_checksum):
-            if not ch_host.system('daemon-reload'):
+            if not ch_host.service('daemon-reload'):
                 raise RuntimeError("Failed to reload systemd daemon")
 
         vault_changed = (
@@ -289,7 +289,7 @@ class KeystoneLDAPCharm(charms_openstack.charm.OpenStackCharm):
         override_conf = OVERRIDE_CONF.format(self.domain_name)
         if os.path.exists(override_conf):
             os.unlink(override_conf)
-            ch_host.system('daemon-reload')
+            ch_host.service('daemon-reload')
 
 
 class KeystoneLDAPCharmRocky(KeystoneLDAPCharm):
