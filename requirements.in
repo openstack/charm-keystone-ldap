@@ -9,7 +9,7 @@
 # * https://github.com/openstack-charmers/zaza/issues/421
 # * https://mail.python.org/pipermail/cryptography-dev/2021-January/001003.html
 #
-cryptography<3.4
+cryptography<50.1
 looseversion  # distutils.version.LooseVersion replacement for Python 3.12+
 git+https://github.com/juju/charm-tools.git
 simplejson
